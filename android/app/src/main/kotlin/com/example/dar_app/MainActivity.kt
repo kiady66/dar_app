@@ -1,4 +1,4 @@
-package com.example.dar_app
+package app.dar
 
 import io.flutter.embedding.android.FlutterActivity
 

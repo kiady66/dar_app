@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "562830115680",
+    "project_id": "darapp-cdb76",
+    "storage_bucket": "darapp-cdb76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:562830115680:android:7f4d7fa9290b19b2255405",
+        "android_client_info": {
+          "package_name": "app.dar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkACUStJSL3sHefv495DwMIPFcft_ojTo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

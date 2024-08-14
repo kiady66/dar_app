@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../discussion.dart';
+import '../entity/discussion.dart';
 
 class DiscussionCard extends StatelessWidget {
   final Discussion discussion;

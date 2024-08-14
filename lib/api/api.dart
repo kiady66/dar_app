@@ -1,7 +1,13 @@
 
 
-import 'discussion.dart';
-import 'message.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import '../entity/discussion.dart';
+import '../entity/message.dart';
+
+const String apiEndpoint = 'http://192.168.0.50:3000';
+
 
 List<Message> getMessages(currentUserID, otherUserID, int page, int pageSize) {
   List<Message> messages = [];
@@ -15,23 +21,25 @@ List<Message> getMessages(currentUserID, otherUserID, int page, int pageSize) {
   return messages;
 }
 
-List<Discussion> getDiscussion(int page, int pageSize) {
-  final discussionsJson = mockDiscussionListJson['discussions'] as List<dynamic>;
+Future<List<Discussion>> getDiscussion({int page = 1, int pageSize = 10}) async {
 
-  // Calculate the start and end index based on the page and pageSize
-  final startIndex = (page - 1) * pageSize;
-  final endIndex = startIndex + pageSize;
+  const String path = '$apiEndpoint/discussions-list';
 
-  // Ensure the end index does not exceed the length of the list
-  final limitedEndIndex = endIndex > discussionsJson.length ? discussionsJson.length : endIndex;
+  try {
+    final response = await http.get(Uri.parse('$path?page=$page&pageSize=$pageSize'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final List<dynamic> pageDiscussionsJson = responseData['discussions'];
 
-  // Get the subset of discussions for the requested page
-  final pageDiscussionsJson = discussionsJson.sublist(startIndex, limitedEndIndex);
+      final discussions = pageDiscussionsJson.map((json) => Discussion.fromJson(json as Map<String, dynamic>)).toList();
+      return discussions;
+    } else {
+      throw Exception('Failed to load discussions');
+    }
+  } catch (e) {
+    throw Exception('Failed to load discussions');
+  }
 
-  // Convert the subset of JSON to a list of Discussion objects
-  final discussions = pageDiscussionsJson.map((json) => Discussion.fromJson(json as Map<String, dynamic>)).toList();
-
-  return discussions;
 }
 
 const mockDiscussionListJson = {

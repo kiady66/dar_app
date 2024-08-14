@@ -2,25 +2,13 @@ import 'package:dar_app/widget/discussionCard.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import 'api.dart';
-import 'discussion.dart';
-// Dummy function for fetching discussions
-Future<List<Discussion>> fetchDiscussions(int page, int pageSize) async {
-  // Simulate network delay
-  await Future.delayed(const Duration(seconds: 2));
+import '../api/api.dart';
+import '../entity/discussion.dart';
 
-  // Replace this with your actual data fetching logic
-  final discussionsJson = mockDiscussionListJson['discussions'] as List<dynamic>;
-
-  final startIndex = (page - 1) * pageSize;
-  final endIndex = startIndex + pageSize;
-  final limitedEndIndex = endIndex > discussionsJson.length ? discussionsJson.length : endIndex;
-  final pageDiscussionsJson = discussionsJson.sublist(startIndex, limitedEndIndex);
-
-  return pageDiscussionsJson.map((json) => Discussion.fromJson(json as Map<String, dynamic>)).toList();
-}
 
 class DiscussionPage extends StatefulWidget {
+  const DiscussionPage({super.key});
+
   @override
   _DiscussionPageState createState() => _DiscussionPageState();
 }
@@ -40,7 +28,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
   Future<void> _fetchPage(int pageKey) async {
     try {
-      final newItems = await fetchDiscussions(pageKey, _pageSize);
+      final newItems = await getDiscussion(page: pageKey, pageSize: _pageSize);
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);

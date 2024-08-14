@@ -1,4 +1,4 @@
-import 'package:dar_app/discussionPage.dart';
+import 'package:dar_app/page/discussionPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {

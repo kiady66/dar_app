@@ -1,19 +1,19 @@
-import 'package:dar_app/widget/discussionCard.dart';
+import 'package:dar_app/page/discussion/widget/discussionCard.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../api/api.dart';
-import '../entity/discussion.dart';
+import '../../api/api.dart';
+import '../../entity/discussion.dart';
 
 
 class DiscussionPage extends StatefulWidget {
   const DiscussionPage({super.key});
 
   @override
-  _DiscussionPageState createState() => _DiscussionPageState();
+  DiscussionPageState createState() => DiscussionPageState();
 }
 
-class _DiscussionPageState extends State<DiscussionPage> {
+class DiscussionPageState extends State<DiscussionPage> {
   static const _pageSize = 10;
 
   final PagingController<int, Discussion> _pagingController = PagingController(firstPageKey: 1);

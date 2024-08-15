@@ -49,6 +49,7 @@ class DiscussionPageState extends State<DiscussionPage> {
         title: const Text('Discussions'),
       ),
       body: PagedListView<int, Discussion>(
+        key: const PageStorageKey('discussions'),
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate<Discussion>(
           itemBuilder: (context, discussion, index) {

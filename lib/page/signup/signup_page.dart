@@ -5,7 +5,6 @@ import 'package:loading_overlay/loading_overlay.dart';
 
 import '../../components/components.dart';
 import '../../constants.dart';
-import '../home/home_page.dart';
 import '../login/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -27,7 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.popAndPushNamed(context, HomePage.id);
+        Navigator.popAndPushNamed(context, LoginPage.id);
         return true;
       },
       child: Scaffold(
@@ -114,13 +113,6 @@ class _SignUpPageState extends State<SignUpPage> {
                                       desc: 'Go login now',
                                       btnText: 'Login Now',
                                       onPressed: () {
-                                        setState(() {
-                                          _saving = false;
-                                          Navigator.popAndPushNamed(
-                                              context, SignUpPage.id);
-                                        });
-                                        Navigator.pushNamed(
-                                            context, LoginPage.id);
                                       },
                                     ).show();
                                   }
@@ -148,7 +140,6 @@ class _SignUpPageState extends State<SignUpPage> {
                               }
                             },
                             questionPressed: () async {
-                              Navigator.pushNamed(context, LoginPage.id);
                             },
                           ),
                         ],

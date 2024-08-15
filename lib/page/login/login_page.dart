@@ -1,134 +1,128 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:dar_app/components/components.dart';
-import 'package:dar_app/constants.dart';
-import 'package:loading_overlay/loading_overlay.dart';
 
-import '../home/home_page.dart';
+import '../../api/api.dart';
+import '../../components/components.dart';
+import '../login/login_page.dart';
+import '../signup/signup_page.dart';
 import '../welcome/welcome_page.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
-  static String id = 'login_screen';
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _auth = FirebaseAuth.instance;
-  late String _email;
-  late String _password;
-  bool _saving = false;
+  static String id = 'home_screen';
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.popAndPushNamed(context, HomePage.id);
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: LoadingOverlay(
-          isLoading: _saving,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  const TopScreenImage(screenImageName: 'welcome.png'),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const ScreenTitle(title: 'Login'),
-                        CustomTextField(
-                          textField: TextField(
-                              onChanged: (value) {
-                                _email = value;
-                              },
-                              style: const TextStyle(
-                                fontSize: 20,
-                              ),
-                              decoration: kTextInputDecoration.copyWith(
-                                  hintText: 'Email')),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(25),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const TopScreenImage(screenImageName: 'home.jpg'),
+              Expanded(
+                child: Padding(
+                  padding:
+                  const EdgeInsets.only(right: 15.0, left: 15, bottom: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      const ScreenTitle(title: 'Hello'),
+                      const Text(
+                        'Welcome to Tasky, where you manage your daily tasks',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 20,
                         ),
-                        CustomTextField(
-                          textField: TextField(
-                            obscureText: true,
-                            onChanged: (value) {
-                              _password = value;
-                            },
-                            style: const TextStyle(
-                              fontSize: 20,
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Hero(
+                        tag: 'login_btn',
+                        child: CustomButton(
+                          buttonText: 'Login',
+                          onPressed: () {
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Hero(
+                        tag: 'signup_btn',
+                        child: CustomButton(
+                          buttonText: 'Sign Up',
+                          isOutlined: true,
+                          onPressed: () {
+                            Navigator.pushNamed(context, SignUpPage.id);
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 25,
+                      ),
+                      const Text(
+                        'Sign up using',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: CircleAvatar(
+                              radius: 25,
+                              child: Image.asset(
+                                  'assets/images/icons/facebook.png'),
                             ),
-                            decoration: kTextInputDecoration.copyWith(
-                                hintText: 'Password'),
                           ),
-                        ),
-                        CustomBottomScreen(
-                          textButton: 'Login',
-                          heroTag: 'login_btn',
-                          question: 'Forgot password?',
-                          buttonPressed: () async {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            setState(() {
-                              _saving = true;
-                            });
-                            try {
-                              await _auth.signInWithEmailAndPassword(
-                                  email: _email, password: _password);
-
+                          IconButton(
+                            onPressed: () async {
+                              User? user = await signInWithGoogle();
                               if (context.mounted) {
-                                setState(() {
-                                  _saving = false;
-                                  Navigator.popAndPushNamed(
-                                      context, LoginPage.id);
-                                });
-                                Navigator.pushNamed(context, WelcomePage.id);
+                                if (user != null) {
+                                  Navigator.pushNamed(context, WelcomePage.id);
+                                } else {
+                                  signUpAlert(
+                                    context: context,
+                                    onPressed: () {
+                                      Navigator.popAndPushNamed(
+                                          context, LoginPage.id);
+                                    }, title: 'Error', desc: 'Sign in failed', btnText: 'Try again',
+                                  );
+                                }
                               }
-                            } catch (e) {
-                              if (context.mounted) {
-                                signUpAlert(
-                                  context: context,
-                                  onPressed: () {
-                                    setState(() {
-                                      _saving = false;
-                                    });
-                                    Navigator.popAndPushNamed(
-                                        context, LoginPage.id);
-                                  },
-                                  title: 'WRONG PASSWORD OR EMAIL',
-                                  desc:
-                                  'Confirm your email and password and try again',
-                                  btnText: 'Try Now',
-                                ).show();
-                              }
-                            }
-                          },
-                          questionPressed: () {
-                            signUpAlert(
-                              onPressed: () async {
-                                await FirebaseAuth.instance
-                                    .sendPasswordResetEmail(email: _email);
-                              },
-                              title: 'RESET YOUR PASSWORD',
-                              desc:
-                              'Click on the button to reset your password',
-                              btnText: 'Reset Now',
-                              context: context,
-                            ).show();
-                          },
-                        ),
-                      ],
-                    ),
+                            },
+                            icon: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.transparent,
+                              child:
+                              Image.asset('assets/images/icons/google.png'),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: CircleAvatar(
+                              radius: 25,
+                              child: Image.asset(
+                                  'assets/images/icons/linkedin.png'),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              )
+            ],
           ),
         ),
       ),

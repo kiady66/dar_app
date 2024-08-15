@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../api/api.dart';
 import '../../components/components.dart';
 import '../login/login_page.dart';
 import '../signup/signup_page.dart';
+import '../welcome/welcome_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -83,7 +86,23 @@ class HomePage extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              User? user = await signInWithGoogle();
+                              print(user);
+                              if (context.mounted) {
+                                if (user != null) {
+                                  Navigator.pushNamed(context, WelcomePage.id);
+                                } else {
+                                  signUpAlert(
+                                    context: context,
+                                    onPressed: () {
+                                      Navigator.popAndPushNamed(
+                                          context, HomePage.id);
+                                    }, title: 'Error', desc: 'Sign in failed', btnText: 'Try again',
+                                  );
+                                }
+                              }
+                            },
                             icon: CircleAvatar(
                               radius: 25,
                               backgroundColor: Colors.transparent,

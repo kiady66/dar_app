@@ -8,6 +8,7 @@ import '../../entity/discussion.dart';
 
 class DiscussionPage extends StatefulWidget {
   const DiscussionPage({super.key});
+  static String id = 'discussion_page';
 
   @override
   DiscussionPageState createState() => DiscussionPageState();

@@ -5,8 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
+import '../entity/date_proposition.dart';
 import '../entity/discussion.dart';
 import '../entity/message.dart';
+import '../entity/profile.dart';
+import '../entity/session.dart';
 
 const String apiEndpoint = 'http://192.168.0.50:3000';
 
@@ -23,25 +26,93 @@ List<Message> getMessages(currentUserID, otherUserID, int page, int pageSize) {
   return messages;
 }
 
+Future<bool> postToServer(String endpoint, Map<String, dynamic> body) async {
+  final String path = '$apiEndpoint/$endpoint';
+
+  try {
+    final response = await http.post(
+      Uri.parse(path),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    return response.statusCode == 200;
+  } catch (e) {
+    return false; // Failure
+  }
+}
+
+
 Future<List<Discussion>> getDiscussion({int page = 1, int pageSize = 10}) async {
 
   const String path = '$apiEndpoint/discussions-list';
 
   try {
     final response = await http.get(Uri.parse('$path?page=$page&pageSize=$pageSize'));
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      final List<dynamic> pageDiscussionsJson = responseData['discussions'];
 
-      final discussions = pageDiscussionsJson.map((json) => Discussion.fromJson(json as Map<String, dynamic>)).toList();
-      return discussions;
-    } else {
+    if (response.statusCode != 200) {
       throw Exception('Failed to load discussions');
     }
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    final List<dynamic> pageDiscussionsJson = responseData['discussions'];
+
+    final discussions = pageDiscussionsJson.map((json) => Discussion.fromJson(json as Map<String, dynamic>)).toList();
+    return discussions;
+
   } catch (e) {
     throw Exception('Failed to load discussions');
   }
 
+}
+
+Future<bool> sendProposition(DateProposition proposition) async {
+  final Map<String, dynamic> propositionJson = proposition.toJson();
+  return postToServer('send-proposition', propositionJson);
+}
+
+Future<bool> sendMessage(Message message) async {
+  final Map<String, dynamic> messageJson = message.toJson();
+  return postToServer('send-message', messageJson);
+}
+
+Future<bool> respondToProposition(String propositionID, bool accepted) async {
+  final Map<String, dynamic> responseJson = {
+    'propositionID': propositionID,
+    'accepted': accepted,
+  };
+  return postToServer('respond-to-proposition', responseJson);
+}
+
+Future<bool> register(Profile profile) async {
+  final Map<String, dynamic> profileJson = profile.toJson();
+  return postToServer('register', profileJson);
+}
+
+Future<Session> login(String authToken) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$apiEndpoint/login'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({'authToken': authToken}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to login');
+    }
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    final Profile profile = Profile.fromJson(responseData['profile']);
+    return Session(profile: profile, authToken: authToken);
+  } catch (e) {
+    throw Exception('Failed to login');
+  }
 }
 
 Future<User?> signInWithGoogle() async {

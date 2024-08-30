@@ -1,3 +1,5 @@
+import 'date_proposition.dart';
+
 class Discussion {
   final String title;
   final String id;
@@ -5,6 +7,7 @@ class Discussion {
   final String otherUserID;
   final DateTime timestamp;
   final String lastMessage;
+  final DateProposition dateProposition; // Optional date proposition
 
   Discussion({
     required this.title,
@@ -13,6 +16,7 @@ class Discussion {
     required this.otherUserID,
     required this.timestamp,
     required this.lastMessage,
+    required this.dateProposition,
   });
 
   factory Discussion.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,7 @@ class Discussion {
       otherUserID: json['otherUserID'],
       timestamp: DateTime.parse(json['timestamp']),
       lastMessage: json['lastMessage'],
+      dateProposition: DateProposition.fromJson(json['dateProposition']),
     );
   }
 
@@ -34,6 +39,7 @@ class Discussion {
       'otherUserID': otherUserID,
       'timestamp': timestamp.toIso8601String(),
       'lastMessage': lastMessage,
+      'dateProposition': dateProposition?.toJson(),
     };
   }
 }
